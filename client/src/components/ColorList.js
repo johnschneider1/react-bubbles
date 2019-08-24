@@ -10,8 +10,10 @@ const ColorList = ({ colors, updateColors }) => {
   console.log("color test:", colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [newColor, setNewColor] = useState(initialColor);
 
   const editColor = color => {
+    console.log("editcolor:", color);
     setEditing(true);
     setColorToEdit(color);
   };
@@ -47,6 +49,20 @@ const ColorList = ({ colors, updateColors }) => {
         updateColors(colors.filter(color => color.id !== res.data));
       })
       .catch(err => console.error(err.response));
+  };
+
+  // const handleColor = e => {
+  //   setNewColor({ ...newColor, [e.target.name]: e.target.value });
+  // };
+
+  const addColor = () => {
+    axiosWithAuth()
+      .post("http://localhost:5000/api/colors", newColor)
+      .then(res => {
+        console.log("add color:", res);
+        updateColors(res.data);
+      })
+      .catch(err => console.error(err));
   };
 
   return (
@@ -98,8 +114,35 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
+      <form onSubmit={addColor}>
+        <legend>New Color</legend>
+        <label>
+          color name:
+          <input
+            onChange={e => setNewColor({ ...newColor, color: e.target.value })}
+            name="color"
+            type="text"
+            placeholder="color"
+            value={newColor.color}
+          />
+        </label>
+        <label>
+          hex code:
+          <input
+            onChange={e =>
+              setNewColor({ ...newColor, code: { hex: e.target.value } })
+            }
+            name="hex"
+            type="text"
+            placeholder="hex"
+            value={newColor.code.hex}
+          />
+        </label>
+        <button className="btn btn-primary mb1 bg-black" type="submit">
+          Add Color
+        </button>
+      </form>
       <div className="spacer" />
-      {/* stretch - build another form here to add a color */}
     </div>
   );
 };
